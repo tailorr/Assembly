@@ -140,7 +140,7 @@
     </div>
     <script src="./bower_components/jquery/dist/jquery.min.js"></script>
     <script>
-        var CarouselFactory = (function() {
+        let CarouselFactory = (function() {
             function Carousel($carousel) {
                 this.$carousel = $carousel
                 this.$imgWrap = this.$carousel.children().eq(0)
@@ -150,6 +150,7 @@
                 this.$bullet = this.$carousel.find('.bullet')
                 this.$bullets = this.$bullet.find('li')
                 this.$imgWidth = this.$carousel.width()
+                this.isAnimate = false
                 this.timerId = null
                 this.index = 0
                 this._init()
@@ -160,58 +161,69 @@
                     this.$imgWrap.prepend(this.$images.last().clone())
                     this.$imgWrap.css('left', -this.$imgWidth)
                     this._bindEvent()
-                        // this._autoPlay()
+                    this._autoPlay()
                 },
                 _autoPlay: function() {
-                    var _this = this
-                    this.timerId = setInterval(function() {
-                        _this._play(_this.index + 1)
-                    }, 2000)
+                    this.timerId = setInterval(() => {
+                        this._play(this.index + 1)
+                    }, 3000)
                 },
                 _bindEvent: function() {
-                    var _this = this
-                    this.$preBtn.on('click', function() {
-                        _this._play(_this.index - 1)
+                    this.$preBtn.on('click', () => {
+                        this._play(this.index - 1)
                     })
-                    this.$nextBtn.on('click', function() {
-                        _this._play(_this.index + 1)
+                    this.$nextBtn.on('click', () => {
+                        this._play(this.index + 1)
                     })
-                    this.$carousel.on('mouseenter', function() {
-                        // _this._pausePlay()
+                    this.$carousel.on('mouseenter', () => {
+                        this._pausePlay()
                     })
-                    this.$carousel.on('mouseleave', function() {
-                        // _this._autoPlay()
+                    this.$carousel.on('mouseleave', () => {
+                        this._autoPlay()
                     })
-                    this.$bullet.on('click', 'li', function() {
-                        _this._play($(this).index())
+                    this.$bullet.on('click', 'li', (e) => {
+                        this._play($(e.currentTarget).index())
                     })
                 },
                 _play: function(targetIndex) {
-                    var _this = this,
-                        step = 0
-                    step = targetIndex - this.index
-                    console.log(step)
-                    if (step < 0) {
-                        this.$imgWrap.animate({
-                            'left': '+=' + this.$imgWidth
-                        }, function() {
-                            _this.index -= step
-                            _this._calIndex()
-                            _this.$imgWrap.css('left', -(_this.index + 1) * _this.$imgWidth)
-                            _this._setBullet()
-                        })
-                    }
 
-                    if (step > 0) {
-                        this.$imgWrap.animate({
-                            'left': '-=' + step * this.$imgWidth
-                        }, function() {
-                            _this.index += step;
-                            _this._calIndex()
-                            _this.$imgWrap.css('left', -(_this.index + 1) * _this.$imgWidth)
-                            _this._setBullet()
-                        })
-                    }
+                    if (this.isAnimate) return
+                    this.isAnimate = true
+                    let step = targetIndex - this.index
+
+                    this.$imgWrap.animate({
+                        'left': '-=' + step * this.$imgWidth
+                    }, 800, () => {
+                        this.index += step
+                        this._calIndex()
+                        this.$imgWrap.css('left', -(this.index + 1) * this.$imgWidth)
+                        this._setBullet()
+                        this.isAnimate = false
+                    })
+
+                    // if (step < 0) {
+                    //     this.$imgWrap.animate({
+                    //         'left': '-=' + step * this.$imgWidth
+                    //     }, 800, () => {
+                    //         this.index += step
+                    //         this._calIndex()
+                    //         this.$imgWrap.css('left', -(this.index + 1) * this.$imgWidth)
+                    //         this._setBullet()
+                    //         this.isAnimate = false
+                    //     })
+                    // }
+
+                    // if (step > 0) {
+                    //     this.$imgWrap.animate({
+                    //         'left': '-=' + step * this.$imgWidth
+                    //     }, 800, () => {
+                    //         this.index += step;
+                    //         this._calIndex()
+                    //         this.$imgWrap.css('left', -(this.index + 1) * this.$imgWidth)
+                    //         this._setBullet()
+                    //         this.isAnimate = false
+                    //     })
+                    // }
                 },
                 _calIndex: function() {
                     switch (this.index) {
@@ -226,7 +238,6 @@
                 },
                 _pausePlay: function() {
                     clearInterval(this.timerId)
-
                 },
                 _setBullet: function() {
                     this.$bullets.removeClass('active').eq(this.index).addClass('active')
@@ -234,7 +245,7 @@
             }
 
             function init($carousel) {
-                [].forEach.call($carousel, (item) => {
+                [].forEach.call($carousel, item => {
                     if ($(item).hasClass('init')) return
                     new Carousel($(item))
                     $(item).addClass('init')
@@ -249,12 +260,12 @@
         CarouselFactory.init($('.carousel'))
 
 
-        // var $carousel = $('.carousel')
-        // var $imgWrap = $('.img-wrap')
-        // var $images = $('.img-wrap>li')
-        // var $preBtn = $('.pre')
-        // var $nextBtn = $('.next')
-        // var $imgWidth = $images.eq(0).width()
+        // let $carousel = $('.carousel')
+        // let $imgWrap = $('.img-wrap')
+        // let $images = $('.img-wrap>li')
+        // let $preBtn = $('.pre')
+        // let $nextBtn = $('.next')
+        // let $imgWidth = $images.eq(0).width()
 
         //初始化
         // $images.first().clone().appendTo($('.img-wrap'))
@@ -263,8 +274,8 @@
         //     "left": -$imgWidth
         // })
 
-        // var pageIndex = 0
-        // var isAnimate = false
+        // let pageIndex = 0
+        // let isAnimate = false
 
         // autoPlay()
 
@@ -281,7 +292,7 @@
 
 
         // $('.bullet').on('click', 'li', function() {
-        //     var index = $(this).index()
+        //     let index = $(this).index()
         //     if (index > pageIndex) {
         //         playNext(index - pageIndex)
         //     } else if (index < pageIndex) {
